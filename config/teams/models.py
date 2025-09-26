@@ -19,6 +19,7 @@ class Idea(models.Model):
     link = models.URLField(max_length=500, blank=True, null=True)  # Optional Idea URL
     is_primary = models.BooleanField(default=False)  # Primary idea flag
     created_at = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.idea_title} ({'Primary' if self.is_primary else 'Secondary'}) - {self.team.team_name}"

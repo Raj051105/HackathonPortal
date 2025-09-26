@@ -58,6 +58,9 @@ class LandingPageViewSet(viewsets.ViewSet):
             progress = IdeaScore.objects.filter(idea=primary_idea).exists()
             total_marks = IdeaScore.objects.filter(idea=primary_idea).aggregate(total=Sum('score'))['total'] or 0
 
+            total_ideas = team.ideas.count()
+            approved_count = team.ideas.filter(approved=True).count()
+
             data.append({
                 'team_id': team.team_id,
                 'team_name': team.team_name,
@@ -65,6 +68,7 @@ class LandingPageViewSet(viewsets.ViewSet):
                 'primary_ps_title': primary_idea.ps_title,
                 'progress': progress,
                 'marks': total_marks,
+                'approved_count': f"{approved_count}/{total_ideas}"
             })
 
         return Response(data)

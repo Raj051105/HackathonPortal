@@ -11,5 +11,4 @@ urlpatterns = [
     path('', include(router.urls)),
     path('teams/<str:team_id>/details/', TeamDetailView.as_view(), name='team-detail'),
     path('teams/scores/submit/', SubmitRubricScoresView.as_view(), name='submit-rubric-scores'),
-
 ]

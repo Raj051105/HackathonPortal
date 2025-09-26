@@ -5,4 +5,4 @@ __pycache__/
 *.pyd
 __pycache__
 .Python
-
+*\db.sqlite3

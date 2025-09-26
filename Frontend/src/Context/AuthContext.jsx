@@ -118,9 +118,9 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', data.access)
       localStorage.setItem('refreshToken', data.refresh)
       
-      // Create user object
+      // Create user object with username from API response
       const userData = { 
-        username: username,
+        username: data.username || username, // Use username from API response, fallback to input
         // Add any other user data you receive from the API
       }
       localStorage.setItem('user', JSON.stringify(userData))

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import Header from '../Components/Header'
 
 const BASE_URL = "http://127.0.0.1:8000"
 
 const MarkEntry = () => {
   const { id: team_id } = useParams()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [mainProblem, setMainProblem] = useState(null)
@@ -13,12 +14,12 @@ const MarkEntry = () => {
   
   // Marking criteria state
   const [marks, setMarks] = useState({
-    'Problem Understanding': '',
-    'Innovativeness': '',
-    'Feasibility': '',
-    'Prototype Quality': '',
-    'Impact': '',
-    'Presentation/Teamwork': ''
+    'Relevance to the Problem Statement': '',
+    'Innovativeness & Creativity': '',
+    'Technical Feasibility': '',
+    'Implementation & Prototype Quality': '',
+    'Impact & Usefulness': '',
+    'Presentation & Teamwork': ''
   })
 
   useEffect(() => {
@@ -112,13 +113,6 @@ const MarkEntry = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    // Validate that all marks are filled
-    const hasEmptyMarks = Object.values(marks).some(mark => mark === '' || mark === null || mark === undefined)
-    if (hasEmptyMarks) {
-      alert('Please fill in all marking criteria before submitting.')
-      return
-    }
 
     try {
       const token = localStorage.getItem('token')
@@ -150,6 +144,8 @@ const MarkEntry = () => {
       }
 
       alert('Marks submitted successfully!')
+      // Redirect to dashboard after successful submission
+      navigate('/dashboard')
     } catch (err) {
       console.error('Error submitting marks:', err)
       alert(`Failed to submit marks: ${err.message}`)
@@ -212,8 +208,8 @@ const MarkEntry = () => {
 
   const markingCriteria = [
     { 
-      id: 'Problem Understanding', 
-      label: 'Problem Understanding & Relevance',
+      id: 'Relevance to the Problem Statement', 
+      label: 'Relevance to the Problem Statement',
       maxMarks: 20,
       description: [
         'Clarity in explaining the problem statement.',
@@ -222,7 +218,7 @@ const MarkEntry = () => {
       ]
     },
     { 
-      id: 'Innovativeness', 
+      id: 'Innovativeness & Creativity', 
       label: 'Innovativeness & Creativity',
       maxMarks: 20,
       description: [
@@ -232,7 +228,7 @@ const MarkEntry = () => {
       ]
     },
     { 
-      id: 'Feasibility', 
+      id: 'Technical Feasibility', 
       label: 'Technical Feasibility',
       maxMarks: 20,
       description: [
@@ -242,7 +238,7 @@ const MarkEntry = () => {
       ]
     },
     { 
-      id: 'Prototype Quality', 
+      id: 'Implementation & Prototype Quality', 
       label: 'Implementation & Prototype Quality',
       maxMarks: 25,
       description: [
@@ -252,7 +248,7 @@ const MarkEntry = () => {
       ]
     },
     { 
-      id: 'Impact', 
+      id: 'Impact & Usefulness', 
       label: 'Impact & Usefulness',
       maxMarks: 10,
       description: [
@@ -262,7 +258,7 @@ const MarkEntry = () => {
       ]
     },
     { 
-      id: 'Presentation/Teamwork', 
+      id: 'Presentation & Teamwork', 
       label: 'Presentation & Teamwork',
       maxMarks: 5,
       description: [

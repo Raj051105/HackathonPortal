@@ -11,6 +11,7 @@ const MarkEntry = () => {
   const [error, setError] = useState(null)
   const [mainProblem, setMainProblem] = useState(null)
   const [otherProblems, setOtherProblems] = useState([])
+  const [approvedIdeas, setApprovedIdeas] = useState({})
   
   // Marking criteria state
   const [marks, setMarks] = useState({
@@ -80,6 +81,15 @@ const MarkEntry = () => {
 
         setMainProblem(transformedMainProblem)
         setOtherProblems(transformedSecondaryIdeas)
+        // initialize approvedIdeas map (no idea approved by default)
+        setApprovedIdeas(() => {
+          const map = {}
+          // main idea
+          map[transformedMainProblem.title] = false
+          // secondary ideas
+          transformedSecondaryIdeas.forEach(i => { map[i.title] = false })
+          return map
+        })
       } catch (err) {
         console.error('Error fetching data:', err)
         setError(err.message)
@@ -95,6 +105,10 @@ const MarkEntry = () => {
       setLoading(false)
     }
   }, [team_id])
+
+  const toggleApprove = (title) => {
+    setApprovedIdeas(prev => ({ ...prev, [title]: !prev[title] }))
+  }
 
   const handleMarkChange = (criteria, value) => {
     // Find the maximum marks for this criteria
@@ -129,6 +143,12 @@ const MarkEntry = () => {
         }), {})
       }
 
+      // Build approval titles list from checked boxes
+      const approveTitles = Object.entries(approvedIdeas)
+        .filter(([title, checked]) => checked)
+        .map(([title]) => title)
+
+      // Prepare fetches: submit marks and (optionally) submit approvals concurrently
       const response = await fetch(`${BASE_URL}/api/teams/scores/submit/`, {
         method: 'POST',
         headers: {
@@ -138,9 +158,32 @@ const MarkEntry = () => {
         body: JSON.stringify(submitData)
       })
 
+      // If approval list is non-empty, send approval request as well
+      let approveResponse = { ok: true }
+      if (approveTitles.length > 0) {
+        // NOTE: assuming backend expects { titles: [..] } as body. Change if your API needs a different key.
+        const approvePromise = fetch(`${BASE_URL}/api/teams/${team_id}/ideas/approve/`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          // send raw array of titles as the request body
+          body: JSON.stringify({ approved_ideas: approveTitles })
+        })
+
+        // We already have marks response; await the approval response now
+        approveResponse = await approvePromise
+      }
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
         throw new Error(errorData.message || `Failed to submit marks: ${response.status}`)
+      }
+
+      if (approveTitles.length > 0 && !approveResponse.ok) {
+        const errorData = await approveResponse.json().catch(() => ({}))
+        throw new Error(errorData.message || `Failed to approve ideas: ${approveResponse.status}`)
       }
 
       alert('Marks submitted successfully!')
@@ -275,7 +318,18 @@ const MarkEntry = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Primary Information */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Primary Information</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Primary Information</h2>
+            <label className="flex items-center space-x-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={!!approvedIdeas[mainProblem.title]}
+                onChange={() => toggleApprove(mainProblem.title)}
+                className="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
+              />
+              <span>Approve Idea</span>
+            </label>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <p className="text-sm font-medium text-gray-500">Team ID</p>
@@ -352,9 +406,20 @@ const MarkEntry = () => {
               {otherProblems.map(problem => (
                 <div key={problem.id} className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
                   <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500 mb-1">Team ID</p>
-                      <p className="text-base font-semibold text-gray-900">{problem.teamId}</p>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500 mb-1">Team ID</p>
+                        <p className="text-base font-semibold text-gray-900">{problem.teamId}</p>
+                      </div>
+                      <label className="flex items-center space-x-2 text-sm text-gray-700">
+                        <input
+                          type="checkbox"
+                          checked={!!approvedIdeas[problem.title]}
+                          onChange={() => toggleApprove(problem.title)}
+                          className="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
+                        />
+                        <span>Approve Idea</span>
+                      </label>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500 mb-1">Idea Name</p>

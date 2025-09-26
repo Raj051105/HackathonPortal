@@ -13,7 +13,8 @@ const Dashboard = () => {
       'Problem Statement Title': item.title,
       'Status': item.progress,
       'Marks': item.marks || 'Not graded',
-      'PPT Link': item.pptLink || 'N/A'
+      'Approved Ideas': item.approvedCount || 'N/A',
+      'Approved Idea Titles': item.approvedTitles && item.approvedTitles.length > 0 ? item.approvedTitles.join('; ') : 'None'
     }))
 
     const ws = XLSX.utils.json_to_sheet(exportData)
@@ -59,6 +60,8 @@ const Dashboard = () => {
           psId: item.primary_ps_id,
           title: item.primary_ps_title,
           pptLink: item.ppt_link,
+          approvedCount: item.approved_count,
+          approvedTitles: item.approved_titles || [],
           progress: item.progress ? 'Reviewed' : 'In Review',
           marks: item.marks
         }))

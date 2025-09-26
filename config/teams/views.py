@@ -61,6 +61,9 @@ class LandingPageViewSet(viewsets.ViewSet):
             total_ideas = team.ideas.count()
             approved_count = team.ideas.filter(approved=True).count()
 
+            # collect titles of approved ideas for this team
+            approved_titles = list(team.ideas.filter(approved=True).values_list('idea_title', flat=True))
+
             data.append({
                 'team_id': team.team_id,
                 'team_name': team.team_name,
@@ -68,7 +71,8 @@ class LandingPageViewSet(viewsets.ViewSet):
                 'primary_ps_title': primary_idea.ps_title,
                 'progress': progress,
                 'marks': total_marks,
-                'approved_count': f"{approved_count}/{total_ideas}"
+                'approved_count': f"{approved_count}/{total_ideas}",
+                'approved_titles': approved_titles
             })
 
         return Response(data)
@@ -179,18 +183,19 @@ class ApproveIdeasView(APIView):
         if not team:
             return Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        approved_idea_ids = request.data.get('approved_ideas', [])
+        approved_idea_titles = request.data.get('approved_ideas', [])
 
-        # Validate all idea IDs belong to this team
+        # Validate idea titles belong to this team
         all_ideas = team.ideas.all()
-        all_idea_ids = set(str(idea.id) for idea in all_ideas)
-        invalid_ids = [iid for iid in approved_idea_ids if iid not in all_idea_ids]
-        if invalid_ids:
-            return Response({"detail": f"Invalid idea IDs for team: {invalid_ids}"}, status=status.HTTP_400_BAD_REQUEST)
+        all_idea_titles = set(idea.idea_title for idea in all_ideas)
+        invalid_titles = [title for title in approved_idea_titles if title not in all_idea_titles]
+        if invalid_titles:
+            return Response({"detail": f"Invalid idea titles for team: {invalid_titles}"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Update approval statuses
-        # Approve selected ideas
+        # Mark all ideas unapproved first
         all_ideas.update(approved=False)
-        team.ideas.filter(id__in=approved_idea_ids).update(approved=True)
+        # Approve only ideas matching titles
+        team.ideas.filter(idea_title__in=approved_idea_titles).update(approved=True)
 
         return Response({"detail": "Approval statuses updated."}, status=status.HTTP_200_OK)

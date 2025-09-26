@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TeamViewSet, IdeaViewSet, LandingPageViewSet, TeamDetailView, SubmitRubricScoresView
+from .views import TeamViewSet, IdeaViewSet, LandingPageViewSet, TeamDetailView, SubmitRubricScoresView, ApproveIdeasView
 
 router = DefaultRouter()
 router.register(r'teams', TeamViewSet)
@@ -11,4 +11,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('teams/<str:team_id>/details/', TeamDetailView.as_view(), name='team-detail'),
     path('teams/scores/submit/', SubmitRubricScoresView.as_view(), name='submit-rubric-scores'),
+    path('teams/<str:team_id>/ideas/approve/', ApproveIdeasView.as_view(), name='approve-ideas'),
 ]

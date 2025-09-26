@@ -170,3 +170,27 @@ class SubmitRubricScoresView(APIView):
             return Response({"errors": errors, "saved_scores": saved_scores}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"detail": "Scores saved", "scores": saved_scores}, status=status.HTTP_200_OK)
+    
+class ApproveIdeasView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, team_id):
+        team = Team.objects.filter(team_id=team_id).first()
+        if not team:
+            return Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        approved_idea_ids = request.data.get('approved_ideas', [])
+
+        # Validate all idea IDs belong to this team
+        all_ideas = team.ideas.all()
+        all_idea_ids = set(str(idea.id) for idea in all_ideas)
+        invalid_ids = [iid for iid in approved_idea_ids if iid not in all_idea_ids]
+        if invalid_ids:
+            return Response({"detail": f"Invalid idea IDs for team: {invalid_ids}"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update approval statuses
+        # Approve selected ideas
+        all_ideas.update(approved=False)
+        team.ideas.filter(id__in=approved_idea_ids).update(approved=True)
+
+        return Response({"detail": "Approval statuses updated."}, status=status.HTTP_200_OK)

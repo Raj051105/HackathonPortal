@@ -4,7 +4,7 @@ from .views import RubricCriterionViewSet, IdeaScoreViewSet
 
 router = DefaultRouter()
 router.register(r'rubrics', RubricCriterionViewSet)
-router.register(r'scores', IdeaScoreViewSet)
+router.register(r'scores', IdeaScoreViewSet, basename='ideascore')
 
 urlpatterns = [
     path('', include(router.urls)),

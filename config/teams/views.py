@@ -10,6 +10,8 @@ from rest_framework.response import Response
 from django.db.models import Sum
 from judging.models import IdeaScore, RubricCriterion
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -116,3 +118,51 @@ class TeamDetailView(APIView):
         }
 
         return Response(response)
+    
+class SubmitRubricScoresView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        team_id = data.get('team_id')
+        scores_data = {k: v for k, v in data.items() if k != 'team_id'}
+
+        team = get_object_or_404(Team, team_id=team_id)
+        primary_idea = team.ideas.filter(is_primary=True).first()
+        if not primary_idea:
+            return Response({"detail": "Primary idea not found for team"}, status=status.HTTP_404_NOT_FOUND)
+
+        judge = request.user
+
+        errors = {}
+        saved_scores = []
+
+        for rubric_name, score_value in scores_data.items():
+            try:
+                criterion = RubricCriterion.objects.get(name=rubric_name)
+            except RubricCriterion.DoesNotExist:
+                errors[rubric_name] = "Criterion not found"
+                continue
+
+            # Validate score_value within range
+            if not isinstance(score_value, (int, float)) or score_value < 0 or score_value > criterion.max_score:
+                errors[rubric_name] = f"Invalid score. Must be 0 to {criterion.max_score}"
+                continue
+
+            # Save or update score
+            obj, created = IdeaScore.objects.update_or_create(
+                idea=primary_idea,
+                judge=judge,
+                criterion=criterion,
+                defaults={'score': score_value}
+            )
+            saved_scores.append({
+                "criterion": rubric_name,
+                "score": score_value,
+                "created": created,
+            })
+
+        if errors:
+            return Response({"errors": errors, "saved_scores": saved_scores}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"detail": "Scores saved", "scores": saved_scores}, status=status.HTTP_200_OK)

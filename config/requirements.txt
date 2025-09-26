@@ -6,3 +6,5 @@ openpyxl>=3.1.2              # For Excel export functionality
 pandas>=2.0.3                # Optional, for data handling in marksheet export
 xlrd>=2.0.1                  # Optional, if you plan to read Excel files
 django-cors-headers
+pandas
+openpyxl

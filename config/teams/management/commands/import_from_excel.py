@@ -80,7 +80,7 @@ class Command(BaseCommand):
                     primary_ps_desc = pick(row, 'primary_ps_description', 'primary_ps_desc')
                     primary_idea_title = pick(row, 'primary_idea_title', 'primary_idea', 'primary idea', 'primary_idea_title')
                     primary_idea_desc = pick(row, 'primary_idea_description', 'primary_idea_desc', 'primary_idea_description')
-                    primary_link = pick(row, 'primary_ppt_link', 'primary_link', 'ppt_link', 'link')
+                    # links intentionally ignored per request
 
                     if primary_idea_title or primary_idea_desc or primary_sih or primary_ps_title:
                         # unset other primary flags if we create a primary here
@@ -93,7 +93,6 @@ class Command(BaseCommand):
                                 'ps_title': primary_ps_title or '',
                                 'ps_description': primary_ps_desc or '',
                                 'idea_description': primary_idea_desc or '',
-                                'link': primary_link or None,
                                 'is_primary': True,
                             }
                         )
@@ -104,7 +103,7 @@ class Command(BaseCommand):
                         idea_desc = pick(row, f'idea{i}_description', f'idea_{i}_description', f'extra{i}_idea_description')
                         ps_title = pick(row, f'idea{i}_ps_title', f'extra{i}_ps_title', f'idea{i}_ps_title')
                         ps_desc = pick(row, f'idea{i}_ps_description', f'extra{i}_ps_description', f'idea{i}_ps_description')
-                        link = pick(row, f'idea{i}_ppt_link', f'idea_{i}_link', f'extra{i}_ppt_link')
+                        # links intentionally ignored per request
                         if idea_title or idea_desc or ps_title:
                             Idea.objects.update_or_create(
                                 team=team,
@@ -114,7 +113,6 @@ class Command(BaseCommand):
                                     'ps_title': ps_title or '',
                                     'ps_description': ps_desc or '',
                                     'idea_description': idea_desc or '',
-                                    'link': link or None,
                                     'is_primary': False,
                                 }
                             )
@@ -137,7 +135,8 @@ class Command(BaseCommand):
                     ps_title = str(row.get('ps_title') or row.get('PS Title') or '').strip()
                     ps_description = str(row.get('ps_description') or row.get('PS Description') or '')
                     idea_description = str(row.get('idea_description') or row.get('Idea Description') or '')
-                    link = str(row.get('link') or row.get('ppt_link') or '') or None
+                    # links intentionally ignored per request
+                    link = None
                     is_primary = bool(row.get('is_primary') or row.get('primary') or False)
                     approved = bool(row.get('approved') or False)
 
@@ -153,7 +152,7 @@ class Command(BaseCommand):
                             'ps_title': ps_title,
                             'ps_description': ps_description,
                             'idea_description': idea_description,
-                            'link': link,
+                            # link removed
                             'is_primary': is_primary,
                             'approved': approved,
                         }

@@ -108,7 +108,6 @@ class TeamDetailView(APIView):
                 "primary_ps_description": idea.ps_description,  # Add PS description
                 "idea_title": idea.idea_title,
                 "idea_description": idea.idea_description,
-                "ppt_link": idea.link,
             }
             for idea in secondary_ideas_qs
         ]
@@ -119,7 +118,6 @@ class TeamDetailView(APIView):
             "primary_idea": {
                 "idea_title": primary_idea.idea_title,
                 "idea_description": primary_idea.idea_description,
-                "primary_ppt_link": primary_idea.link,
             },
             "rubric_scores": rubric_scores,
             "secondary_ideas": secondary_ideas,

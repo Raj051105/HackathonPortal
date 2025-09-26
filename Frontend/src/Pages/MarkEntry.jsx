@@ -28,7 +28,7 @@ const MarkEntry = () => {
       try {
         setLoading(true)
         setError(null)
-        
+
         const token = localStorage.getItem('token')
         if (!token) {
           throw new Error('No authentication token found')
@@ -59,7 +59,6 @@ const MarkEntry = () => {
           teamName: data.team_name || 'Unknown Team',
           title: data.primary_idea.idea_title || 'No title provided',
           description: data.primary_idea.idea_description || 'No description provided',
-          pptLink: data.primary_idea.primary_ppt_link || '#'
         }
 
         // Set the marks if they exist
@@ -76,7 +75,6 @@ const MarkEntry = () => {
           teamId: data.team_id || 'N/A',
           title: idea.idea_title || 'No title provided',
           description: idea.idea_description || 'No description provided',
-          pptLink: idea.ppt_link || '#'
         }))
 
         setMainProblem(transformedMainProblem)

@@ -16,7 +16,6 @@ class Idea(models.Model):
     ps_description = models.TextField()           # Problem Statement detailed description
     idea_title = models.CharField(max_length=200)  # Idea title
     idea_description = models.TextField()         # Idea description
-    link = models.URLField(max_length=500, blank=True, null=True)  # Optional Idea URL
     is_primary = models.BooleanField(default=False)  # Primary idea flag
     created_at = models.DateTimeField(auto_now_add=True)
     approved = models.BooleanField(default=False)

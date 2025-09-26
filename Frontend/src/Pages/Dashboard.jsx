@@ -59,7 +59,6 @@ const Dashboard = () => {
           teamName: item.team_name,
           psId: item.primary_ps_id,
           title: item.primary_ps_title,
-          pptLink: item.ppt_link,
           approvedCount: item.approved_count,
           approvedTitles: item.approved_titles || [],
           progress: item.progress ? 'Reviewed' : 'In Review',
@@ -328,16 +327,7 @@ const Dashboard = () => {
                             <SquarePen />
                           </Link>
                         )}
-                        {item.pptLink && (
-                          <a
-                            href={item.pptLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                          >
-                            <Eye />
-                          </a>
-                        )}
+                        {/* ppt/link removed */}
                       </div>
                     </td>
                   </tr>

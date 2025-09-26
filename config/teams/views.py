@@ -4,6 +4,10 @@ from .serializers import TeamSerializer, IdeaSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from accounts.permissions import IsAdminUser
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.db.models import Sum
+from judging.models import IdeaScore
 
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
@@ -32,3 +36,30 @@ class IdeaViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
+    
+class LandingPageViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]  # Adjust if needed
+
+    @action(detail=False, methods=['get'])
+    def landing_data(self, request):
+        teams = Team.objects.all()
+        data = []
+
+        for team in teams:
+            primary_idea = team.ideas.filter(is_primary=True).first()
+            if not primary_idea:
+                continue
+
+            progress = IdeaScore.objects.filter(idea=primary_idea).exists()
+            total_marks = IdeaScore.objects.filter(idea=primary_idea).aggregate(total=Sum('score'))['total'] or 0
+
+            data.append({
+                'team_id': team.team_id,
+                'team_name': team.team_name,
+                'primary_ps_id': primary_idea.sih_ps_id,
+                'primary_ps_title': primary_idea.ps_title,
+                'progress': progress,
+                'marks': total_marks,
+            })
+
+        return Response(data)

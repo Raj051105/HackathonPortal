@@ -11,6 +11,7 @@ class RubricCriterion(models.Model):
 
 
 class IdeaScore(models.Model):
+    
     idea = models.ForeignKey(Idea, related_name='scores', on_delete=models.CASCADE)
     judge = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     criterion = models.ForeignKey(RubricCriterion, on_delete=models.CASCADE)

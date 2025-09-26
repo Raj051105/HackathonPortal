@@ -5,3 +5,11 @@ __pycache__/
 *.pyd
 __pycache__
 .Python
+
+# SQLite database files
+*.sqlite3
+*.sqlite
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

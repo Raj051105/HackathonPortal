@@ -1,6 +1,10 @@
-from django.urls import path
-from .views import HelloView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import UserViewSet
+
+router = DefaultRouter()
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
-    path('hello/', HelloView.as_view(), name='hello'),
+    path('', include(router.urls)),
 ]

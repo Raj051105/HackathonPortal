@@ -23,6 +23,7 @@ const Dashboard = () => {
   }
 
   const [loading, setLoading] = useState(true)
+  const BASE_URL = 'http://127.0.0.1:8000'
   const [error, setError] = useState(null)
 
   const [stats, setStats] = useState({
@@ -40,7 +41,7 @@ const Dashboard = () => {
         console.log("token", token)
         if (!token) throw new Error('No authentication token found')
 
-        const response = await fetch('http://127.0.0.1:8000/api/landing/landing_data/', {
+        const response = await fetch(`${BASE_URL}/api/landing/landing_data/`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -87,6 +88,7 @@ const Dashboard = () => {
     const matchesSearch =
       item.teamId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.teamName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.psId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.title.toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesFilter = filterProgress === 'All' || item.progress === filterProgress
@@ -219,7 +221,7 @@ const Dashboard = () => {
                   </svg>
                   <input
                     type="text"
-                    placeholder="Search by team ID, team name, or title..."
+                    placeholder="Search by team ID, team name, PS ID, or PS title..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
@@ -308,12 +310,21 @@ const Dashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex space-x-2">
-                        <Link
-                          to={`/mark/${item.id}`}
-                          className="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
-                        >
-                          <SquarePen />
-                        </Link>
+                        {item.progress === 'Reviewed' ? (
+                          <span
+                            className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-400 bg-gray-100 cursor-not-allowed"
+                            title="Already reviewed"
+                          >
+                            <SquarePen />
+                          </span>
+                        ) : (
+                          <Link
+                            to={`/mark/${item.id}`}
+                            className="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                          >
+                            <SquarePen />
+                          </Link>
+                        )}
                         {item.pptLink && (
                           <a
                             href={item.pptLink}

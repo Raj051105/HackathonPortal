@@ -38,7 +38,6 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token')
-        console.log("token", token)
         if (!token) throw new Error('No authentication token found')
 
         const response = await fetch(`${BASE_URL}/api/landing/landing_data/`, {

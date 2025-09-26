@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: config/Dockerfile
+    container_name: hackathon_backend
+    restart: unless-stopped
+    volumes:
+      - ./:/app:cached
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile
+    container_name: hackathon_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+# Optional Postgres service (not used by default because project uses SQLite)
+# postgres:
+#   image: postgres:15-alpine
+#   environment:
+#     POSTGRES_DB: hackathon
+#     POSTGRES_USER: hackathon
+#     POSTGRES_PASSWORD: changeme
+#   volumes:
+#     - pgdata:/var/lib/postgresql/data
+#   ports:
+#     - "5432:5432"
+
+#volumes:
+#  pgdata:
+  

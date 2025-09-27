@@ -1,12 +1,12 @@
 from judging.models import RubricCriterion
 
 criteria = [
-    ("Problem Understanding", 20),
-    ("Innovativeness", 20),
-    ("Feasibility", 15),
-    ("Prototype Quality", 20),
-    ("Impact", 15),
-    ("Presentation/Teamwork", 10),
+    ("Relevance to the Problem Statement", 20),
+    ("Innovativeness & Creativity", 20),
+    ("Technical Feasibility", 20),
+    ("Implementation & Prototype Quality", 25),
+    ("Impact & Usefulness", 10),
+    ("Presentation & Teamwork", 5),
 ]
 
 for name, max_score in criteria:
